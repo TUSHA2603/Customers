@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Customer List</title>
+</head>
+<body>
+    <h2>Customer List</h2>
+    <div id="customerList"></div>
+
+    <script>
+        const bearerToken = localStorage.getItem('bearerToken');
+        const customerList = document.getElementById("customerList");
+
+        // Ensure the user is authenticated before making this API call
+        if (bearerToken) {
+            // Make a GET request to retrieve the customer list
+            fetch('https://qa2.sunbasedata.com/sunbase/portal/api/assignment.jsp?cmd=get_customer_list', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${bearerToken}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.length > 0) {
+                    const table = document.createElement("table");
+                    table.innerHTML = "<tr><th>First Name</th><th>Last Name</th><th>Email</th></tr>";
+
+                    data.forEach(customer => {
+                        table.innerHTML += `<tr><td>${customer.first_name}</td><td>${customer.last_name}</td><td>${customer.email}</td></tr>`;
+                    });
+
+                    customerList.appendChild(table);
+                } else {
+                    customerList.textContent = 'No customers found.';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>

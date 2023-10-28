@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+</head>
+<body>
+    <h2>Login</h2>
+    <form id="loginForm">
+        <label for="login_id">Email:</label>
+        <input type="text" id="login_id" name="login_id" value="test@sunbasedata.com" required><br><br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" value="Test@123" required><br><br>
+        <input type="submit" value="Login">
+    </form>
+
+    <div id="tokenStatus"></div>
+
+    <script>
+        const loginForm = document.getElementById("loginForm");
+        const tokenStatus = document.getElementById("tokenStatus");
+
+        loginForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+
+            const login_id = document.getElementById("login_id").value;
+            const password = document.getElementById("password").value;
+
+            // Make a POST request to authenticate the user
+            fetch('https://qa2.sunbasedata.com/sunbase/portal/api/assignment_auth.jsp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ login_id, password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.token) {
+                    tokenStatus.textContent = 'Authentication successful. Bearer Token: ' + data.token;
+
+                    // Save the token for subsequent API calls
+                    localStorage.setItem('bearerToken', data.token);
+                } else {
+                    tokenStatus.textContent = 'Authentication failed';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>
